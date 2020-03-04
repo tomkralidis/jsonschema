@@ -235,6 +235,8 @@ the JSON Schema specification. For details on the methods and attributes
 that each validator class provides see the `IValidator` interface,
 which each included validator class implements.
 
+.. autoclass:: Draft201909Validator
+
 .. autoclass:: Draft7Validator
 
 .. autoclass:: Draft6Validator
@@ -281,7 +283,7 @@ validation can be enabled by hooking in a format-checking object into an
     >>> validate(
     ...     instance="-12",
     ...     schema={"format" : "ipv4"},
-    ...     format_checker=draft7_format_checker,
+    ...     format_checker=draft201909_format_checker,
     ... )
     Traceback (most recent call last):
         ...

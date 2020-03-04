@@ -14,10 +14,12 @@ from jsonschema import (
     Draft4Validator,
     Draft6Validator,
     Draft7Validator,
+    Draft201909Validator,
     draft3_format_checker,
     draft4_format_checker,
     draft6_format_checker,
     draft7_format_checker,
+    draft201909_format_checker,
 )
 from jsonschema.tests._helpers import bug
 from jsonschema.tests._suite import Suite
@@ -28,6 +30,7 @@ DRAFT3 = SUITE.version(name="draft3")
 DRAFT4 = SUITE.version(name="draft4")
 DRAFT6 = SUITE.version(name="draft6")
 DRAFT7 = SUITE.version(name="draft7")
+DRAFT201909 = SUITE.version(name="draft2019-09")
 
 
 def skip(message, **kwargs):
@@ -443,6 +446,74 @@ TestDraft7 = DRAFT7.to_unittest_testcase(
             case_description='const with {"a": true} does not match {"a": 1}',
         )(test)
     ),
+)
+
+
+TestDraft201909 = DRAFT201909.to_unittest_testcase(
+    DRAFT201909.tests(),
+    DRAFT201909.format_tests(),
+    DRAFT201909.optional_tests_of(name="bignum"),
+    DRAFT201909.optional_tests_of(name="content"),
+    DRAFT201909.optional_tests_of(name="zeroTerminatedFloats"),
+    Validator=Draft201909Validator,
+    format_checker=draft201909_format_checker,
+    # skip=lambda test: (
+    #     narrow_unicode_build(test)
+    #     or missing_format(draft201909_format_checker)(test)
+    #     or skip(
+    #         message=bug(),
+    #         subject="ref",
+    #         case_description="Recursive references between schemas",
+    #     )(test)
+    #     or skip(
+    #         message=bug(32019091),
+    #         subject="ref",
+    #         case_description="Location-independent identifier",
+    #     )(test)
+    #     or skip(
+    #         message=bug(32019091),
+    #         subject="ref",
+    #         case_description=(
+    #             "Location-independent identifier with absolute URI"
+    #         ),
+    #     )(test)
+    #     or skip(
+    #         message=bug(32019091),
+    #         subject="ref",
+    #         case_description=(
+    #             "Location-independent identifier with base URI change in subschema"
+    #         ),
+    #     )(test)
+    #     or skip(
+    #         message=bug(),
+    #         subject="refRemote",
+    #         case_description="base URI change - change folder in subschema",
+    #     )(test)
+    #     or skip(
+    #         message="Upstream bug in strict_rfc3339",
+    #         subject="date-time",
+    #         description="case-insensitive T and Z",
+    #     )(test)
+    #     or skip(
+    #         message=bug(593),
+    #         subject="content",
+    #         case_description=(
+    #             "validation of string-encoded content based on media type"
+    #         ),
+    #     )(test)
+    #     or skip(
+    #         message=bug(593),
+    #         subject="content",
+    #         case_description="validation of binary string-encoding",
+    #     )(test)
+    #     or skip(
+    #         message=bug(593),
+    #         subject="content",
+    #         case_description=(
+    #             "validation of binary-encoded media type documents"
+    #         ),
+    #     )(test)
+    # ),
 )
 
 

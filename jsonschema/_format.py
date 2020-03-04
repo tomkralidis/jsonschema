@@ -131,6 +131,7 @@ draft3_format_checker = FormatChecker()
 draft4_format_checker = FormatChecker()
 draft6_format_checker = FormatChecker()
 draft7_format_checker = FormatChecker()
+draft201909_format_checker = FormatChecker()
 
 
 _draft_checkers = dict(
@@ -138,6 +139,7 @@ _draft_checkers = dict(
     draft4=draft4_format_checker,
     draft6=draft6_format_checker,
     draft7=draft7_format_checker,
+    draft201909=draft7_format_checker,
 )
 
 
@@ -147,12 +149,14 @@ def _checks_drafts(
     draft4=None,
     draft6=None,
     draft7=None,
+    draft201909=None,
     raises=(),
 ):
     draft3 = draft3 or name
     draft4 = draft4 or name
     draft6 = draft6 or name
     draft7 = draft7 or name
+    draft201909 = draft201909 or name
 
     def wrap(func):
         if draft3:
@@ -163,13 +167,17 @@ def _checks_drafts(
             func = _draft_checkers["draft6"].checks(draft6, raises)(func)
         if draft7:
             func = _draft_checkers["draft7"].checks(draft7, raises)(func)
+        if draft201909:
+            func = _draft_checkers["draft201909"].checks(draft201909, raises)(
+                func,
+            )
 
         # Oy. This is bad global state, but relied upon for now, until
         # deprecation. See https://github.com/Julian/jsonschema/issues/519
         # and test_format_checkers_come_with_defaults
-        FormatChecker.cls_checks(draft7 or draft6 or draft4 or draft3, raises)(
-            func,
-        )
+        FormatChecker.cls_checks(
+            draft201909 or draft7 or draft6 or draft4 or draft3, raises,
+        )(func)
         return func
     return wrap
 
