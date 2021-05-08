@@ -428,6 +428,25 @@ Draft7Validator = create(
     version="draft7",
 )
 
+Draft202012Validator = create(
+    meta_schema=_utils.load_schema("draft2020-12"),
+    validators={
+        u"$ref": _validators.ref,
+        u"additionalProperties": _validators.additionalProperties,
+        u"allOf": _validators.allOf,
+        u"anyOf": _validators.anyOf,
+        u"enum": _validators.enum,
+        u"maximum": _validators.maximum,
+        u"minimum": _validators.minimum,
+        u"multipleOf": _validators.multipleOf,
+        u"oneOf": _validators.oneOf,
+        u"properties": _validators.properties,
+        u"required": _validators.required,
+        u"type": _validators.type,
+    },
+    version="draft2020-12",
+)
+
 _LATEST_VERSION = Draft7Validator
 
 

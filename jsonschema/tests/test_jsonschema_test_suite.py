@@ -13,10 +13,12 @@ from jsonschema import (
     Draft4Validator,
     Draft6Validator,
     Draft7Validator,
+    Draft202012Validator,
     draft3_format_checker,
     draft4_format_checker,
     draft6_format_checker,
     draft7_format_checker,
+    draft202012_format_checker,
 )
 from jsonschema.tests._helpers import bug
 from jsonschema.tests._suite import Suite
@@ -26,6 +28,7 @@ DRAFT3 = SUITE.version(name="draft3")
 DRAFT4 = SUITE.version(name="draft4")
 DRAFT6 = SUITE.version(name="draft6")
 DRAFT7 = SUITE.version(name="draft7")
+DRAFT202012 = SUITE.version(name="draft2020-12")
 
 
 def skip(message, **kwargs):
@@ -402,6 +405,136 @@ TestDraft7 = DRAFT7.to_unittest_testcase(
         or skip(
             message=bug(371),
             subject="ref",
+            case_description=(
+                "Location-independent identifier with "
+                "base URI change in subschema"
+            ),
+        )(test)
+        or skip(
+            message=bug(371),
+            subject="id",
+            description="match $ref to id",
+        )(test)
+        or skip(
+            message=bug(371),
+            subject="id",
+            description="no match on enum or $ref to id",
+        )(test)
+        or skip(
+            message=bug(),
+            subject="refRemote",
+            case_description="base URI change - change folder in subschema",
+        )(test)
+        or skip(
+            message=bug(593),
+            subject="content",
+            valid=False,
+            case_description=(
+                "validation of string-encoded content based on media type"
+            ),
+        )(test)
+        or skip(
+            message=bug(593),
+            subject="content",
+            valid=False,
+            case_description="validation of binary string-encoding",
+        )(test)
+        or skip(
+            message=bug(593),
+            subject="content",
+            valid=False,
+            case_description=(
+                "validation of binary-encoded media type documents"
+            ),
+        )(test)
+        or skip(
+            message=bug(686),
+            subject="uniqueItems",
+            description="[0] and [false] are unique",
+        )(test)
+        or skip(
+            message=bug(686),
+            subject="uniqueItems",
+            description="[1] and [true] are unique",
+        )(test)
+        or skip(
+            message=bug(686),
+            subject="uniqueItems",
+            description="nested [0] and [false] are unique",
+        )(test)
+        or skip(
+            message=bug(686),
+            subject="uniqueItems",
+            description="nested [1] and [true] are unique",
+        )(test)
+        or skip(
+            message=bug(686),
+            subject="uniqueItems",
+            description='{"a": false} and {"a": 0} are unique',
+        )(test)
+        or skip(
+            message=bug(686),
+            subject="uniqueItems",
+            description='{"a": true} and {"a": 1} are unique',
+        )(test)
+        or skip(
+            message=bug(686),
+            subject="const",
+            case_description="const with [false] does not match [0]",
+        )(test)
+        or skip(
+            message=bug(686),
+            subject="const",
+            case_description="const with [true] does not match [1]",
+        )(test)
+        or skip(
+            message=bug(686),
+            subject="const",
+            case_description='const with {"a": false} does not match {"a": 0}',
+        )(test)
+        or skip(
+            message=bug(686),
+            subject="const",
+            case_description='const with {"a": true} does not match {"a": 1}',
+        )(test)
+    ),
+)
+
+
+TestDraft202012 = DRAFT202012.to_unittest_testcase(
+    DRAFT202012.tests(),
+    DRAFT202012.format_tests(),
+    DRAFT202012.optional_tests_of(name="bignum"),
+    DRAFT202012.optional_tests_of(name="non-bmp-regex"),
+    Validator=Draft202012Validator,
+    format_checker=draft202012_format_checker,
+    skip=lambda test: (
+        narrow_unicode_build(test)
+        or missing_date_fromisoformat(test)
+        or allowed_leading_zeros(test)
+        or leap_second(test)
+        or missing_format(draft202012_format_checker)(test)
+        or complex_email_validation(test)
+        or skip(
+            message=bug(),
+            subject="ref",
+            case_description="Recursive references between schemas",
+        )(test)
+        or skip(
+            message=bug(371),
+            subject="anchor",
+            case_description="Location-independent identifier",
+        )(test)
+        or skip(
+            message=bug(371),
+            subject="anchor",
+            case_description=(
+                "Location-independent identifier with absolute URI"
+            ),
+        )(test)
+        or skip(
+            message=bug(371),
+            subject="anchor",
             case_description=(
                 "Location-independent identifier with "
                 "base URI change in subschema"
