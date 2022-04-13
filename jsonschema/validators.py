@@ -998,14 +998,28 @@ class RefResolver:
 
         if scheme in self.handlers:
             result = self.handlers[scheme](uri)
-        elif scheme in ["http", "https"] and requests:
-            # Requests has support for detecting the correct encoding of
-            # json over http
-            result = requests.get(uri).json()
         else:
-            # Otherwise, pass off to urllib and assume utf-8
-            with urlopen(uri) as url:
-                result = json.loads(url.read().decode("utf-8"))
+            path = urlsplit(uri).path
+            if scheme in [u"http", u"https"] and requests:
+                # Requests has support for detecting the correct encoding
+                received = requests.get(uri).text
+            else:
+                # Otherwise, pass off to urllib and assume utf-8
+                with urlopen(uri) as url:
+                    received = url.read().decode("utf-8")
+
+            try:
+                # always try JSON first
+                result = json.loads(received)
+            except json.decoder.JSONDecodeError:
+                # perhaps YAML?
+                try:
+                    import yaml
+                    result = yaml.safe_load(received)
+                except ImportError:
+                    pass
+                except yaml.scanner.ScannerError:
+                    raise ValueError("Unable to parse remote $ref")
 
         if self.cache_remote:
             self.store[uri] = result
