@@ -1,3 +1,37 @@
+v4.17.3
+=======
+
+* Fix instantiating validators with cached refs to boolean schemas
+  rather than objects (#1018).
+
+v4.17.2
+=======
+
+* Empty strings are not valid relative JSON Pointers (aren't valid under the
+  RJP format).
+* Durations without (trailing) units are not valid durations (aren't
+  valid under the duration format). This involves changing the dependency
+  used for validating durations (from ``isoduration`` to ``isodate``).
+
+v4.17.1
+=======
+
+* The error message when using ``unevaluatedProperties`` with a non-trivial
+  schema value (i.e. something other than ``false``) has been improved (#996).
+
+v4.17.0
+=======
+
+* The ``check_schema`` method on ``jsonschema.protocols.Validator`` instances
+  now *enables* format validation by default when run. This can catch some
+  additional invalid schemas (e.g. containing invalid regular expressions)
+  where the issue is indeed uncovered by validating against the metaschema
+  with format validation enabled as an assertion.
+* The ``jsonschema`` CLI (along with ``jsonschema.cli`` the module) are now
+  deprecated. Use ``check-jsonschema`` instead, which can be installed via
+  ``pip install check-jsonschema`` and found
+  `here <https://github.com/python-jsonschema/check-jsonschema>`_.
+
 v4.16.1
 =======
 

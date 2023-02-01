@@ -638,7 +638,7 @@
             "$ref": "#bigint",
             "$defs": {
                 "bigint": {
-                    "$comment": "canonical uri: /ref-and-id2/base.json/$defs/bigint; another valid uri for this location: /ref-and-id2/base.json#bigint",
+                    "$comment": "canonical uri: /ref-and-id2/base.json#/$defs/bigint; another valid uri for this location: /ref-and-id2/base.json#bigint",
                     "$anchor": "bigint",
                     "maximum": 10
                 },
@@ -881,6 +881,72 @@
                 "description": "a non-string is invalid",
                 "data": 12,
                 "valid": false
+            }
+        ]
+    },
+    {
+        "description": "ref to if",
+        "schema": {
+            "$ref": "http://example.com/ref/if",
+            "if": {
+                "$id": "http://example.com/ref/if",
+                "type": "integer"
+            }
+        },
+        "tests": [
+            {
+                "description": "a non-integer is invalid due to the $ref",
+                "data": "foo",
+                "valid": false
+            },
+            {
+                "description": "an integer is valid",
+                "data": 12,
+                "valid": true
+            }
+        ]
+    },
+    {
+        "description": "ref to then",
+        "schema": {
+            "$ref": "http://example.com/ref/then",
+            "then": {
+                "$id": "http://example.com/ref/then",
+                "type": "integer"
+            }
+        },
+        "tests": [
+            {
+                "description": "a non-integer is invalid due to the $ref",
+                "data": "foo",
+                "valid": false
+            },
+            {
+                "description": "an integer is valid",
+                "data": 12,
+                "valid": true
+            }
+        ]
+    },
+    {
+        "description": "ref to else",
+        "schema": {
+            "$ref": "http://example.com/ref/else",
+            "else": {
+                "$id": "http://example.com/ref/else",
+                "type": "integer"
+            }
+        },
+        "tests": [
+            {
+                "description": "a non-integer is invalid due to the $ref",
+                "data": "foo",
+                "valid": false
+            },
+            {
+                "description": "an integer is valid",
+                "data": 12,
+                "valid": true
             }
         ]
     }

@@ -224,6 +224,7 @@ This suite is being used by:
 ### C++
 
 * [Modern C++ JSON schema validator](https://github.com/pboettch/json-schema-validator)
+* [Valijson](https://github.com/tristanpenman/valijson)
 
 ### Dart
 
@@ -282,8 +283,8 @@ Node-specific support is maintained in a [separate repository](https://github.co
 
 ### .NET
 
+* [JsonSchema.Net](https://github.com/gregsdennis/json-everything)
 * [Newtonsoft.Json.Schema](https://github.com/JamesNK/Newtonsoft.Json.Schema)
-* [Manatee.Json](https://github.com/gregsdennis/Manatee.Json)
 
 ### Perl
 
@@ -339,3 +340,5 @@ There are some sanity checks in place for testing the test suite. You can run
 them with `bin/jsonschema_suite check` or `tox`. They will be run automatically
 by [GitHub Actions](https://github.com/json-schema-org/JSON-Schema-Test-Suite/actions?query=workflow%3A%22Test+Suite+Sanity+Checking%22)
 as well.
+
+This repository is maintained by the JSON Schema organization, and will be governed by the JSON Schema steering committee (once it exists).

@@ -4,7 +4,7 @@ Creation and extension of validators, with implementations for existing drafts.
 from __future__ import annotations
 
 from collections import deque
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from functools import lru_cache
 from operator import methodcaller
 from urllib.parse import unquote, urldefrag, urljoin, urlsplit
@@ -103,7 +103,11 @@ def _id_of(schema):
 
 def _store_schema_list():
     if not _VOCABULARIES:
-        _VOCABULARIES.extend(_utils.load_schema("vocabularies").items())
+        package = _utils.resources.files(__package__)
+        for version in package.joinpath("schemas", "vocabularies").iterdir():
+            for path in version.iterdir():
+                vocabulary = json.loads(path.read_text())
+                _VOCABULARIES.append((vocabulary["$id"], vocabulary))
     return [
         (id, validator.META_SCHEMA) for id, validator in _META_SCHEMAS.items()
     ] + _VOCABULARIES
@@ -215,9 +219,15 @@ def create(
                 )
 
         @classmethod
-        def check_schema(cls, schema):
+        def check_schema(cls, schema, format_checker=_UNSET):
             Validator = validator_for(cls.META_SCHEMA, default=cls)
-            for error in Validator(cls.META_SCHEMA).iter_errors(schema):
+            if format_checker is _UNSET:
+                format_checker = Validator.FORMAT_CHECKER
+            validator = Validator(
+                schema=cls.META_SCHEMA,
+                format_checker=format_checker,
+            )
+            for error in validator.iter_errors(schema):
                 raise exceptions.SchemaError.create_from(error)
 
         def evolve(self, **changes):
@@ -735,7 +745,8 @@ class RefResolver:
         self.store.update(store)
         self.store.update(
             (schema["$id"], schema)
-            for schema in store.values() if "$id" in schema
+            for schema in store.values()
+            if isinstance(schema, Mapping) and "$id" in schema
         )
         self.store[base_uri] = referrer
 
@@ -1064,9 +1075,9 @@ def validate(instance, schema, cls=None, *args, **kwargs):
             ...
         ValidationError: [2, 3, 4] is too long
 
-    :func:`validate` will first verify that the provided schema is
-    itself valid, since not doing so can lead to less obvious error
-    messages and fail in less obvious or consistent ways.
+    :func:`~jsonschema.validators.validate` will first verify that the
+    provided schema is itself valid, since not doing so can lead to less
+    obvious error messages and fail in less obvious or consistent ways.
 
     If you know you have a valid schema already, especially
     if you intend to validate multiple instances with
@@ -1144,6 +1155,43 @@ def validator_for(schema, default=_UNSET):
 
             If unprovided, the default is to return the latest supported
             draft.
+
+    Examples:
+
+        The :kw:`$schema` JSON Schema keyword will control which validator
+        class is returned:
+
+        >>> schema = {
+        ...     "$schema": "https://json-schema.org/draft/2020-12/schema",
+        ...     "type": "integer",
+        ... }
+        >>> jsonschema.validators.validator_for(schema)
+        <class 'jsonschema.validators.Draft202012Validator'>
+
+
+        Here, a draft 7 schema instead will return the draft 7 validator:
+
+        >>> schema = {
+        ...     "$schema": "http://json-schema.org/draft-07/schema#",
+        ...     "type": "integer",
+        ... }
+        >>> jsonschema.validators.validator_for(schema)
+        <class 'jsonschema.validators.Draft7Validator'>
+
+
+        Schemas with no ``$schema`` keyword will fallback to the default
+        argument:
+
+        >>> schema = {"type": "integer"}
+        >>> jsonschema.validators.validator_for(
+        ...     schema, default=Draft7Validator,
+        ... )
+        <class 'jsonschema.validators.Draft7Validator'>
+
+        or if none is provided, to the latest version supported.
+        Always including the keyword when authoring schemas is highly
+        recommended.
+
     """
 
     DefaultValidator = _LATEST_VERSION if default is _UNSET else default

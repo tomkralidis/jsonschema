@@ -9,6 +9,7 @@ import os
 import subprocess
 import sys
 import tempfile
+import warnings
 
 try:  # pragma: no cover
     from importlib import metadata
@@ -17,13 +18,17 @@ except ImportError:  # pragma: no cover
 
 from pyrsistent import m
 
-from jsonschema import Draft4Validator, Draft202012Validator, cli
+from jsonschema import Draft4Validator, Draft202012Validator
 from jsonschema.exceptions import (
     RefResolutionError,
     SchemaError,
     ValidationError,
 )
 from jsonschema.validators import _LATEST_VERSION, validate
+
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore")
+    from jsonschema import cli
 
 
 def fake_validator(*errors):
@@ -757,7 +762,7 @@ class TestCLI(TestCase):
         error = str(e.exception)
         self.assertIn(f"{os.sep}someNonexistentFile.json'", error)
 
-    def test_invalid_exlicit_base_uri(self):
+    def test_invalid_explicit_base_uri(self):
         schema = '{"$ref": "foo.json#definitions/num"}'
         instance = "1"
 
@@ -895,7 +900,7 @@ class TestCLIIntegration(TestCase):
 
     def test_version(self):
         version = subprocess.check_output(
-            [sys.executable, "-m", "jsonschema", "--version"],
+            [sys.executable, "-W", "ignore", "-m", "jsonschema", "--version"],
             stderr=subprocess.STDOUT,
         )
         version = version.decode("utf-8").strip()
